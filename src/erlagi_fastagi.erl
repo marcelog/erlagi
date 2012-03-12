@@ -5,8 +5,6 @@
 -homepage("http://marcelog.github.com/").
 -license("Apache License 2.0").
 
--include("erlagi_types.hrl").
-
 -import(erlagi).
 -import(erlagi_log).
 -import(erlagi_io_tcp).
