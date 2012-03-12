@@ -12,6 +12,11 @@ I used my own box to test it, with R13B04. Please
 let me know if you have (un)successfully tried it
 in a different version.
 
+License
+-------
+erlagi is under the Apache License 2.0. See the LICENSE file
+for more details.
+
 Usage
 -----
 See the example files:
