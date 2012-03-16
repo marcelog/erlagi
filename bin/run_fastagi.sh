@@ -10,7 +10,7 @@
 main(_) ->
     Path = escript:script_name(),
     Dir = filename:dirname(Path),
-    true = code:add_patha(Dir ++ "/../compiled"),
+    true = code:add_patha(Dir ++ "/../ebin"),
     erlagi_fastagi:run(
         fun erlagi_demo:run/1,
         [

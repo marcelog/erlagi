@@ -23,12 +23,9 @@ MODS = \
 all: compile
 
 .erl.beam:
-	erlc -W -o compiled $<
+	erlc -W -I include -o ebin $<
 
-prepare:
-	mkdir -p compiled
-
-compile: prepare ${MODS:%=%.beam}
+compile: ${MODS:%=%.beam}
 
 clean:
-	rm -rf compiled
+	rm -rf ebin/*.beam

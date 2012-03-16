@@ -30,7 +30,7 @@ multiple calls (See extension 2, below).
 Compiling
 ---------
 Just type make in the top level directory. The .beam files will
-be generated in the compiled/ directory.
+be generated in the ebin/ directory.
 
 Running it
 ----------
