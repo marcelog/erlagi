@@ -12,15 +12,15 @@ concat([], Tail) ->
     Tail
 ;
 
-concat([ H | T ], Tail) ->
-    [ H | concat(T, Tail) ]
+concat([H | T], Tail) ->
+    [H | concat(T, Tail)]
 .
 
 concat([]) ->
     []
 ;
 
-concat([ H | T ]) ->
+concat([H | T]) ->
     concat(H, concat(T))
 .
 

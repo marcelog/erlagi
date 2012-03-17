@@ -8,20 +8,20 @@
 -export( [ open/1, log/2, log/3, close/1, get_logger/1 ] ).
 
 open(Filename) ->
-    {ok, IoDevice} = file:open(Filename, [ append ]),
+    {ok, IoDevice} = file:open(Filename, [append]),
     IoDevice
 .
 
-log(Log, Format, Data) when is_record(Log, agilog), is_list(Data) ->
+log(#agilog{} = Log, Format, Data) when is_list(Data) ->
     io:format(Log#agilog.iodevice, Format, Data)
 .
 
-log(Log, Format) when is_record(Log, agilog) ->
+log(#agilog{} = Log, Format) ->
     log(Log, Format, [])
 .
 
-close(Log) ->
-    ok = file:close(Log#agilog.iodevice)
+close(#agilog{iodevice = Iodevice}) ->
+    ok = file:close(Iodevice)
 .
 
 get_logger(Filename) ->

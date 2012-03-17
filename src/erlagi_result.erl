@@ -32,17 +32,17 @@ get_offset_from_data(Text) ->
 .
 
 get_timeout_from_data(ResultData) ->
-    string:str(ResultData, "timeout") =/= 0
-    orelse string:str(ResultData, "dtmf") =:= 0
+    string:str(ResultData, "timeout") =/= 0 orelse
+        string:str(ResultData, "dtmf") =:= 0
 .
 
 get_result_from_raw(Text) ->
-    Index = string:str(Text, [ 61 ]), % "
+    Index = string:str(Text, [61]), % "
     string:right(Text, string:len(Text) - Index)
 .
 
 split_result_line(Text) ->
-    string:tokens(Text, [ 32 ])
+    string:tokens(Text, [32])
 .
 
 check_result(ResultExploded) when is_list(ResultExploded) ->
@@ -55,8 +55,8 @@ check_result(ResultExploded) when is_list(ResultExploded) ->
 
 parse_result(Cmd, Text) ->
     ResultExploded = split_result_line(Text),
-    [ _ | DataExploded ] = check_result(ResultExploded),
-    [ ResultString | T ] = DataExploded,
+    [_ | DataExploded] = check_result(ResultExploded),
+    [ResultString | T] = DataExploded,
     ResultData = get_data_from_result(T),
     Result = get_result_from_raw(ResultString),
     Offset = get_offset_from_data(ResultData),
@@ -66,7 +66,7 @@ parse_result(Cmd, Text) ->
     }
 .
 
-parse_digit_result(Result) when is_record(Result, agiresult) ->
+parse_digit_result(#agiresult{} = Result) ->
     #agiresult{
         result = get_result(Result),
         timeout = is_timeout(Result),
@@ -78,7 +78,7 @@ parse_digit_result(Result) when is_record(Result, agiresult) ->
     }
 .
 
-parse_ascii_digit_result(Result) when is_record(Result, agiresult) ->
+parse_ascii_digit_result(#agiresult{} = Result) ->
     { Char, _ } = string:to_integer(get_result(Result)),
     #agiresult{
         result = get_result(Result),
@@ -91,47 +91,47 @@ parse_ascii_digit_result(Result) when is_record(Result, agiresult) ->
     }
 .
 
-get_result(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.result
+get_result(#agiresult{result = Result}) ->
+    Result
 .
 
-get_cmd(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.cmd
+get_cmd(#agiresult{cmd = Cmd}) ->
+    Cmd
 .
 
-get_raw(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.raw
+get_raw(#agiresult{raw = Raw}) ->
+    Raw
 .
 
-get_offset(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.offset
+get_offset(#agiresult{offset = Offset}) ->
+    Offset
 .
 
-get_digits(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.digits
+get_digits(#agiresult{digits = Digits}) ->
+    Digits
 .
  
-has_input(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.digits =/= false
+has_input(#agiresult{digits = Digits}) ->
+    Digits =/= false
 .
 
-get_data(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.data
+get_data(#agiresult{data = Data}) ->
+    Data
 .
 
-has_data(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.data =/= false
+has_data(#agiresult{data = Data}) ->
+    Data =/= false
 .
  
-is_timeout(Result) when is_record(Result, agiresult) ->
-    Result#agiresult.timeout
+is_timeout(#agiresult{timeout = Timeout}) ->
+    Timeout
 .
 
-has_valid_variable(Result) when is_record(Result, agiresult) ->
-    get_result(Result) =:= "1"
+has_valid_variable(#agiresult{result = Result}) ->
+    get_result_from_raw(Result) =:= "1"
 .
 
-get_variable(Result) when is_record(Result, agiresult) ->
+get_variable(#agiresult{} = Result) ->
     case has_valid_variable(Result) of
         true ->
             Text = get_data(Result),

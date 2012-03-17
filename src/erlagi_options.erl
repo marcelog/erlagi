@@ -10,10 +10,10 @@
 -export( [ get_option/2 ] ).
 
 get_option(Key, Options) ->
-    Value = [ X || { CandidateKey, X } <- Options, Key =:= CandidateKey ],
+    Value = [X || { CandidateKey, X } <- Options, Key =:= CandidateKey],
     case Value of
         [] -> get_default_option(Key);
-        [ H | _ ] -> H
+        [H | _] -> H
     end
 .
 

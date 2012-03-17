@@ -14,7 +14,7 @@
 
 -export( [ print_result/2, print_agicall/1 ] ).
 
-print_result(Log, Result) when is_record(Result, agiresult) ->
+print_result(Log, #agiresult{} = Result) ->
     erlagi_log:log(Log, "----- AgiResult -----~n"),
     erlagi_log:log(Log, "Command: ~s~n", [ erlagi_result:get_cmd(Result) ]),
     erlagi_log:log(Log, "Raw: ~s~n", [ erlagi_result:get_raw(Result) ]),
@@ -26,15 +26,13 @@ print_result(Log, Result) when is_record(Result, agiresult) ->
     erlagi_log:log(Log, "---------------------~n")
 .
 
-print_agicall(Call) when is_record(Call, agicall) ->
-    Log = Call#agicall.log,
+print_variable(Log, {Key, Value}) ->
+    erlagi_log:log(Log, "Variable [ ~s = ~s ]~n", [ Key, Value ])
+.
+
+print_agicall(#agicall{environment = Env, log = Log}) ->
     erlagi_log:log(Log, "----- AgiCall -----~n"),
-    lists:map(
-        fun({Key, Value}) ->
-            erlagi_log:log(Log, "Variable [ ~s = ~s ]~n", [ Key, Value ])
-        end,
-        Call#agicall.environment
-    ),
+    [ print_variable(Log, V) || V <- Env],
     erlagi_log:log(Log, "-------------------~n")
 .
 

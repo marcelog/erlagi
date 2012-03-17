@@ -11,7 +11,7 @@
 -export( [ read/1 ] ).
 
 split_lines(Text) ->
-    string:tokens(Text, [ 10 ])
+    string:tokens(Text, [10])
 .
 
 %% Returns a tuple, { Key, Value }
@@ -23,19 +23,16 @@ parse_variable(Text) ->
 .
 
 parse_variables(Text) ->
-    lists:map(fun(X) -> parse_variable(X) end, split_lines(Text))
+    [parse_variable(X) || X <- split_lines(Text)]
 .
 
 find_end_of_variables(Text) ->
-    string:str(Text, [ 10, 10 ])
+    string:str(Text, [10, 10])
 .
 
 has_end_of_variables(Text) ->
     Index = find_end_of_variables(Text),
-    case Index of
-        0 -> false;
-        _ -> true
-    end
+    Index =/= 0
 .
 
 remove_end_of_variables(Text) ->

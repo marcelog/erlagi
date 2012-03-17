@@ -12,7 +12,7 @@ get_close_fun() ->
 
 get_send_fun() ->
     fun(Text) ->
-        io:format("~s", [ Text ])
+        io:format("~s", [Text])
     end
 .
 
