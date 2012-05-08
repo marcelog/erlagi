@@ -1,3 +1,18 @@
+%%% Main erlagi module. Use this to execute AGI commands.
+%%%
+%%% Copyright 2012 Marcelo Gornstein <marcelog@gmail.com>
+%%%
+%%% Licensed under the Apache License, Version 2.0 (the "License");
+%%% you may not use this file except in compliance with the License.
+%%% You may obtain a copy of the License at
+%%%
+%%%     http://www.apache.org/licenses/LICENSE-2.0
+%%%
+%%% Unless required by applicable law or agreed to in writing, software
+%%% distributed under the License is distributed on an "AS IS" BASIS,
+%%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%%% See the License for the specific language governing permissions and
+%%% limitations under the License.
 -module(erlagi).
 
 -author("Marcelo Gornstein <marcelog@gmail.com>").
@@ -86,7 +101,7 @@ record(#agicall{} = Call, Args) ->
 
 record(#agicall{} = Call, Filename, Format, EscapeDigits, MaxMilliseconds, MaxSilenceSeconds)
     ->
-    record(Call, [ 
+    record(Call, [
         Filename, Format, EscapeDigits, MaxMilliseconds,
         erlagi_misc:concat([ "s=", MaxSilenceSeconds ])
     ])
@@ -337,7 +352,7 @@ get_data(#agicall{} = Call, Filename, Milliseconds, MaxDigits) ->
 .
 
 set_auto_hangup(#agicall{} = Call, Seconds) ->
-    erlagi_io:agi_rw(Call, "SET AUTOHANGUP", [Seconds]) 
+    erlagi_io:agi_rw(Call, "SET AUTOHANGUP", [Seconds])
 .
 
 indicate_congestion(#agicall{} = Call, Timeout) ->
