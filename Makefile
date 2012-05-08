@@ -1,31 +1,25 @@
-# Based on the makefile example of Joe Armstrong's book
-# "Programming Erlang"
-ERL = erl
-ERLC = erlc
+NAME=erlagi
 
-.SUFFIXES: .erl .beam
+all: compile release
+	./rebar compile
 
-MODS = \
-	src/erlagi \
-	src/erlagi_debug \
-	src/erlagi_defaults \
-	src/erlagi_demo \
-	src/erlagi_fastagi \
-	src/erlagi_log \
-	src/erlagi_io \
-	src/erlagi_io_tcp \
-	src/erlagi_io_normal \
-	src/erlagi_misc \
-	src/erlagi_options \
-	src/erlagi_read_env \
-	src/erlagi_result 
+compile:
+	./rebar compile
 
-all: compile
+release:
+	cd rel && ../rebar generate && cd -
 
-.erl.beam:
-	erlc -W -I include -o ebin $<
-
-compile: ${MODS:%=%.beam}
+node:
+	(cd rel && ../rebar create-node nodeid=${NAME} && cd -)
 
 clean:
-	rm -rf ebin/*.beam
+	./rebar clean
+	rm -rf rel/${NAME}
+
+run:
+	rel/${NAME}/bin/${NAME} start
+
+runconsole:
+	rel/${NAME}/bin/${NAME} console
+
+alldev: clean all runconsole
