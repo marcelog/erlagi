@@ -27,44 +27,36 @@
 -export( [ read/1 ] ).
 
 split_lines(Text) ->
-    string:tokens(Text, [10])
-.
+    string:tokens(Text, [10]).
 
 %% Returns a tuple, { Key, Value }
 parse_variable(Text) ->
     Index = string:str(Text, ":"),
     Key = string:left(Text, Index),
     Value = string:right(Text, string:len(Text) - Index),
-    { Key, Value }
-.
+    { Key, Value }.
 
 parse_variables(Text) ->
-    [parse_variable(X) || X <- split_lines(Text)]
-.
+    [parse_variable(X) || X <- split_lines(Text)].
 
 find_end_of_variables(Text) ->
-    string:str(Text, [10, 10])
-.
+    string:str(Text, [10, 10]).
 
 has_end_of_variables(Text) ->
     Index = find_end_of_variables(Text),
-    Index =/= 0
-.
+    Index =/= 0.
 
 remove_end_of_variables(Text) ->
-    string:left(Text, string:len(Text) - 2)
-.
+    string:left(Text, string:len(Text) - 2).
 
 read_loop(ReadFun, Buffer) ->
     Text = string:concat(Buffer, ReadFun()),
     case has_end_of_variables(Text) of
         false -> read_loop(ReadFun, Text);
         true -> remove_end_of_variables(Text)
-    end
-.
+    end.
 
 read(ReadFun) ->
-    parse_variables(read_loop(ReadFun, ""))
-.
+    parse_variables(read_loop(ReadFun, "")).
 
 

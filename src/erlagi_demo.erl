@@ -21,8 +21,7 @@ run_command(Module, Function, Arguments) ->
     case is_record(Result, agiresult) of
         true -> erlagi_debug:print_result(Log, erlang:apply(Module, Function, Arguments));
         false -> erlagi_log:log(Log, "~s~n", [Result])
-    end
-.
+    end.
 
 run(Call) when is_record(Call, agicall) ->
     run_command(erlagi_debug,print_agicall, [Call]),
@@ -69,6 +68,5 @@ run(Call) when is_record(Call, agicall) ->
     run_command(erlagi, record, [Call, "file", "wav", "#", "3000"]),
     run_command(erlagi, dial, [Call, "SIP/54115555555", "3", "hH"]),
     run_command(erlagi, hangup, [Call]),
-    run_command(erlagi, terminate, [Call])
-.
+    run_command(erlagi, terminate, [Call]).
 

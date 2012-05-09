@@ -22,18 +22,16 @@
 
 -import(erlagi_defaults).
 
--export( [ get_option/2 ] ).
+-export([get_option/2]).
 
 get_option(Key, Options) ->
     Value = [X || { CandidateKey, X } <- Options, Key =:= CandidateKey],
     case Value of
         [] -> get_default_option(Key);
         [H | _] -> H
-    end
-.
+    end.
 
 get_default_option(Key) ->
-    get_option(Key, erlagi_defaults:get_default_options())
-.
+    get_option(Key, erlagi_defaults:get_default_options()).
 
 

@@ -54,367 +54,285 @@ new_call(Log) ->
     ReadFun = erlagi_io_normal:get_recv_fun(),
     SendFun = erlagi_io_normal:get_send_fun(),
     CloseFun = erlagi_io_normal:get_close_fun(),
-    new_call(Log, ReadFun, SendFun, CloseFun)
-.
+    new_call(Log, ReadFun, SendFun, CloseFun).
 
 new_call(Log, ReadFun, SendFun, CloseFun) ->
     Env = erlagi_read_env:read(ReadFun),
-    #agicall{environment=Env, close=CloseFun, read=ReadFun, send=SendFun, log=Log}
-.
+    #agicall{environment=Env, close=CloseFun, read=ReadFun, send=SendFun, log=Log}.
 
 terminate(#agicall{} = Call) ->
-    erlagi_io:close(Call)
-.
+    erlagi_io:close(Call).
 
 set_callerid(#agicall{} = Call, Name, Number) ->
     Clid = erlagi_misc:concat([ [ 34 ], Name, [ 34, 60 ], Number, [ 62 ] ]),
-    erlagi_io:agi_rw(Call, "SET CALLERID", [ Clid ])
-.
+    erlagi_io:agi_rw(Call, "SET CALLERID", [ Clid ]).
 
 enable_music(#agicall{} = Call) ->
-    set_music(Call, "on")
-.
+    set_music(Call, "on").
 
 enable_music(#agicall{} = Call, Class) ->
-    set_music(Call, "on", Class)
-.
+    set_music(Call, "on", Class).
 
 disable_music(#agicall{} = Call) ->
-    set_music(Call, "off")
-.
+    set_music(Call, "off").
 
 disable_music(#agicall{} = Call, Class) ->
-    set_music(Call, "off", Class)
-.
+    set_music(Call, "off", Class).
 
 set_music(#agicall{} = Call, Flag, Class) ->
-    erlagi_io:agi_rw(Call, "SET MUSIC ", [ Flag, Class ])
-.
+    erlagi_io:agi_rw(Call, "SET MUSIC ", [ Flag, Class ]).
 
 set_music(#agicall{} = Call, Flag) ->
-    erlagi_io:agi_rw(Call, "SET MUSIC ", [ Flag ])
-.
+    erlagi_io:agi_rw(Call, "SET MUSIC ", [ Flag ]).
 
 record(#agicall{} = Call, Args) ->
-    erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(Call, "RECORD FILE", Args ))
-.
+    erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(Call, "RECORD FILE", Args )).
 
 record(#agicall{} = Call, Filename, Format, EscapeDigits, MaxMilliseconds, MaxSilenceSeconds)
     ->
     record(Call, [
         Filename, Format, EscapeDigits, MaxMilliseconds,
         erlagi_misc:concat([ "s=", MaxSilenceSeconds ])
-    ])
-.
+    ]).
 
 record(#agicall{} = Call, Filename, Format, EscapeDigits, MaxMilliseconds) ->
-    record(Call, [ Filename, Format, EscapeDigits, MaxMilliseconds ])
-.
+    record(Call, [ Filename, Format, EscapeDigits, MaxMilliseconds ]).
 
 record(#agicall{} = Call, Filename, Format, EscapeDigits) ->
-    record(Call, Filename, Format, EscapeDigits, "-1")
-.
+    record(Call, Filename, Format, EscapeDigits, "-1").
 
 channel_status(#agicall{} = Call) ->
-    erlagi_io:agi_rw(Call, "CHANNEL STATUS")
-.
+    erlagi_io:agi_rw(Call, "CHANNEL STATUS").
 
 channel_status(#agicall{} = Call, Channel) ->
-    erlagi_io:agi_rw(Call, "CHANNEL STATUS", [ Channel ])
-.
+    erlagi_io:agi_rw(Call, "CHANNEL STATUS", [ Channel ]).
 
 dial(#agicall{} = Call, Channel, Timeout, Options) ->
-    exec(Call, "DIAL", [ Channel, Timeout, Options ])
-.
+    exec(Call, "DIAL", [ Channel, Timeout, Options ]).
 
 fax_send(#agicall{} = Call, TiffFile) ->
-    erlagi_io:agi_rw(Call, "SENDFAX", [ TiffFile, "a" ])
-.
+    erlagi_io:agi_rw(Call, "SENDFAX", [ TiffFile, "a" ]).
 
 fax_receive(#agicall{} = Call, TiffFile) ->
-    erlagi_io:agi_rw(Call, "RECEIVEFAX", [ TiffFile ])
-.
+    erlagi_io:agi_rw(Call, "RECEIVEFAX", [ TiffFile ]).
 
 set_context(#agicall{} = Call, Context) ->
-    erlagi_io:agi_rw(Call, "SET CONTEXT", [ Context ])
-.
+    erlagi_io:agi_rw(Call, "SET CONTEXT", [ Context ]).
 
 set_extension(#agicall{} = Call, Extension) ->
-    erlagi_io:agi_rw(Call, "SET EXTENSION", [ Extension ])
-.
+    erlagi_io:agi_rw(Call, "SET EXTENSION", [ Extension ]).
 
 set_priority(#agicall{} = Call, Priority) ->
-    erlagi_io:agi_rw(Call, "SET PRIORITY", [ Priority ])
-.
+    erlagi_io:agi_rw(Call, "SET PRIORITY", [ Priority ]).
 
 get_option(#agicall{} = Call, Filename, EscapeDigits, Timeout) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "GET OPTION", [ Filename, EscapeDigits, Timeout ]
-    ))
-.
+    )).
 
 get_option(#agicall{} = Call, Filename, EscapeDigits) ->
-    get_option(Call, Filename, EscapeDigits, "0")
-.
+    get_option(Call, Filename, EscapeDigits, "0").
 
 say_date(#agicall{} = Call, Timestamp) ->
-    say_date(Call, Timestamp, "")
-.
+    say_date(Call, Timestamp, "").
 
 say_date(#agicall{} = Call, Timestamp, EscapeDigits) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY DATE", [Timestamp, EscapeDigits]
-    ))
-.
+    )).
 
 say_time(#agicall{} = Call, Timestamp) ->
-    say_time(Call, Timestamp, "")
-.
+    say_time(Call, Timestamp, "").
 
 say_time(#agicall{} = Call, Timestamp, EscapeDigits) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY TIME", [Timestamp, EscapeDigits]
-    ))
-.
+    )).
 
 say_datetime(#agicall{} = Call, Timestamp, EscapeDigits) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY DATETIME", [Timestamp, EscapeDigits]
-    ))
-.
+    )).
 say_datetime(#agicall{} = Call, Timestamp, EscapeDigits, Format) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY DATETIME", [Timestamp, EscapeDigits, Format]
-    ))
-.
+    )).
 say_datetime(#agicall{} = Call, Timestamp, EscapeDigits, Format, Tz) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY DATETIME", [Timestamp, EscapeDigits, Format, Tz]
-    ))
-.
+    )).
 
 say_phonetic(#agicall{} = Call, Text) ->
-    say_phonetic(Call, Text, "")
-.
+    say_phonetic(Call, Text, "").
 
 say_phonetic(#agicall{} = Call, Text, EscapeDigits) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY PHONETIC", [Text, EscapeDigits]
-    ))
-.
+    )).
 
 say_alpha(#agicall{} = Call, Text) ->
-    say_alpha(Call, Text, "")
-.
+    say_alpha(Call, Text, "").
 
 say_alpha(#agicall{} = Call, Text, EscapeDigits) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY ALPHA", [Text, EscapeDigits]
-    ))
-.
+    )).
 
 say_number(#agicall{} = Call, Text) ->
-    say_number(Call, Text, "")
-.
+    say_number(Call, Text, "").
 
 say_number(#agicall{} = Call, Text, EscapeDigits) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY NUMBER", [Text, EscapeDigits]
-    ))
-.
+    )).
 
 say_digits(#agicall{} = Call, Text) ->
-    say_digits(Call, Text, "")
-.
+    say_digits(Call, Text, "").
 
 say_digits(#agicall{} = Call, Text, EscapeDigits) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "SAY DIGITS", [Text, EscapeDigits]
-    ))
-.
+    )).
 
 wait_digit(#agicall{} = Call) ->
-    erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(Call, "WAIT FOR DIGIT", [ "-1" ]))
-.
+    erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(Call, "WAIT FOR DIGIT", [ "-1" ])).
 
 wait_digit(#agicall{} = Call, Milliseconds) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "WAIT FOR DIGIT", [Milliseconds]
-    ))
-.
+    )).
 
 get_variable(#agicall{} = Call, Name) ->
     erlagi_result:get_variable(erlagi_io:agi_rw(
         Call, "GET VARIABLE", [Name]
-    ))
-.
+    )).
 
 get_full_variable(#agicall{} = Call, Name) ->
     erlagi_result:get_variable(erlagi_io:agi_rw(
         Call, "GET FULL VARIABLE", [ erlagi_misc:concat([ "${", Name, "}" ]) ]
-    ))
-.
+    )).
 
 set_variable(#agicall{} = Call, Name, Value) ->
-    erlagi_io:agi_rw(Call, "SET VARIABLE", [Name, Value])
-.
+    erlagi_io:agi_rw(Call, "SET VARIABLE", [Name, Value]).
 
 verbose(#agicall{} = Call, Message) ->
-    erlagi_io:agi_rw(Call, "VERBOSE", [Message])
-.
+    erlagi_io:agi_rw(Call, "VERBOSE", [Message]).
 
 log(#agicall{} = Call, Priority, Message) ->
-    exec(Call, "LOG", [Priority, Message])
-.
+    exec(Call, "LOG", [Priority, Message]).
 
 log_notice(#agicall{} = Call, Message) ->
-    log(Call, "NOTICE", Message)
-.
+    log(Call, "NOTICE", Message).
 
 log_error(#agicall{} = Call, Message) ->
-    log(Call, "ERROR", Message)
-.
+    log(Call, "ERROR", Message).
 
 log_dtmf(#agicall{} = Call, Message) ->
-    log(Call, "DTMF", Message)
-.
+    log(Call, "DTMF", Message).
 
 log_verbose(#agicall{} = Call, Message) ->
-    log(Call, "VERBOSE", Message)
-.
+    log(Call, "VERBOSE", Message).
 
 log_debug(#agicall{} = Call, Message) ->
-    log(Call, "DEBUG", Message)
-.
+    log(Call, "DEBUG", Message).
 
 log_warn(#agicall{} = Call, Message) ->
-    log(Call, "WARNING", Message)
-.
+    log(Call, "WARNING", Message).
 
 database_deltree(#agicall{} = Call, Family) ->
-    database_deltree(Call, Family, "")
-.
+    database_deltree(Call, Family, "").
 
 database_deltree(#agicall{} = Call, Family, Key) ->
-    erlagi_io:agi_rw(Call, "DATABASE DELTREE", [Family, Key])
-.
+    erlagi_io:agi_rw(Call, "DATABASE DELTREE", [Family, Key]).
 
 database_del(#agicall{} = Call, Family, Key) ->
-    database_deltree(Call, Family, Key)
-.
+    database_deltree(Call, Family, Key).
 
 database_get(#agicall{} = Call, Family, Key) ->
-    erlagi_io:agi_rw(Call, "DATABASE GET", [Family, Key])
-.
+    erlagi_io:agi_rw(Call, "DATABASE GET", [Family, Key]).
 
 database_put(#agicall{} = Call, Family, Key, Value) ->
-    erlagi_io:agi_rw(Call, "DATABASE PUT", [Family, Key, Value])
-.
+    erlagi_io:agi_rw(Call, "DATABASE PUT", [Family, Key, Value]).
 
 send_image(#agicall{} = Call, Filename) ->
-    erlagi_io:agi_rw(Call, "SEND IMAGE", [Filename])
-.
+    erlagi_io:agi_rw(Call, "SEND IMAGE", [Filename]).
 
 send_text(#agicall{} = Call, Text) ->
-    erlagi_io:agi_rw(Call, "SEND TEXT", [Text])
-.
+    erlagi_io:agi_rw(Call, "SEND TEXT", [Text]).
 
 hangup(#agicall{} = Call) ->
-    erlagi_io:agi_rw(Call, "HANGUP")
-.
+    erlagi_io:agi_rw(Call, "HANGUP").
 
 answer(#agicall{} = Call) ->
-    erlagi_io:agi_rw(Call, "ANSWER")
-.
+    erlagi_io:agi_rw(Call, "ANSWER").
 
 stream_file(#agicall{} = Call, Filename) ->
-    stream_file(Call, Filename, "")
-.
+    stream_file(Call, Filename, "").
 
 stream_file(#agicall{} = Call, Filename, EscapeDigits) ->
     erlagi_result:parse_ascii_digit_result(erlagi_io:agi_rw(
         Call, "STREAM FILE", [Filename, EscapeDigits]
-    ))
-.
+    )).
 
 get_data(#agicall{} = Call, Filename) ->
-    get_data(Call, Filename, "", "")
-.
+    get_data(Call, Filename, "", "").
 
 get_data(#agicall{} = Call, Filename, Milliseconds) ->
-    get_data(Call, Filename, Milliseconds, "")
-.
+    get_data(Call, Filename, Milliseconds, "").
 
 get_data(#agicall{} = Call, Filename, Milliseconds, MaxDigits) ->
     erlagi_result:parse_digit_result(erlagi_io:agi_rw(
         Call, "GET DATA", [Filename, Milliseconds, MaxDigits]
-    ))
-.
+    )).
 
 set_auto_hangup(#agicall{} = Call, Seconds) ->
-    erlagi_io:agi_rw(Call, "SET AUTOHANGUP", [Seconds])
-.
+    erlagi_io:agi_rw(Call, "SET AUTOHANGUP", [Seconds]).
 
 indicate_congestion(#agicall{} = Call, Timeout) ->
-    exec(Call, "CONGESTION", [Timeout])
-.
+    exec(Call, "CONGESTION", [Timeout]).
 
 indicate_progress(#agicall{} = Call) ->
-    exec(Call, "PROGRESS")
-.
+    exec(Call, "PROGRESS").
 
 indicate_congestion(#agicall{} = Call) ->
-    exec(Call, "CONGESTION")
-.
+    exec(Call, "CONGESTION").
 
 indicate_busy(#agicall{} = Call, Timeout) ->
-    exec(Call, "BUSY", [Timeout])
-.
+    exec(Call, "BUSY", [Timeout]).
 
 indicate_busy(#agicall{} = Call) ->
-    exec(Call, "BUSY")
-.
+    exec(Call, "BUSY").
 
 play_dial(#agicall{} = Call) ->
-    play_tone(Call, "DIAL")
-.
+    play_tone(Call, "DIAL").
 
 play_congestion(#agicall{} = Call) ->
-    play_tone(Call, "CONGESTION")
-.
+    play_tone(Call, "CONGESTION").
 
 play_busy(#agicall{} = Call) ->
-    play_tone(Call, "BUSY")
-.
+    play_tone(Call, "BUSY").
 
 play_tone(#agicall{} = Call, Tone) ->
-    exec(Call, "PlayTones", [Tone])
-.
+    exec(Call, "PlayTones", [Tone]).
 
 play_custom_tones(#agicall{} = Call, Freqs) when is_list(Freqs), length(Freqs) > 0 ->
-    exec(Call, "PlayTones", Freqs)
-.
+    exec(Call, "PlayTones", Freqs).
 
 stop_play_tones(#agicall{} = Call) ->
-    exec(Call, "StopPlayTones")
-.
+    exec(Call, "StopPlayTones").
 
 form_exec_arguments([]) ->
-    ""
-;
+    "";
 
 form_exec_arguments(Arguments) when is_list(Arguments), length(Arguments) > 0 ->
-    string:join(Arguments, [44])
-.
+    string:join(Arguments, [44]).
 
 exec(#agicall{} = Call, Application, Arguments) when is_list(Arguments) ->
     ExecArguments = form_exec_arguments(Arguments),
     ExecCmd = erlagi_misc:concat([ "EXEC ", [34], Application, [34]]),
-    erlagi_io:agi_rw(Call, ExecCmd, [ ExecArguments ])
-.
+    erlagi_io:agi_rw(Call, ExecCmd, [ ExecArguments ]).
 
 exec(#agicall{} = Call, Application) ->
-    exec(Call, Application, [])
-.
+    exec(Call, Application, []).
 
 

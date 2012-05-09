@@ -48,8 +48,7 @@ accept_loop(Socket, Log, CallHandler) ->
     after 10 ->
         true
     end,
-    accept_loop(Socket, Log, CallHandler)
-.
+    accept_loop(Socket, Log, CallHandler).
 
 open_socket(Config) when is_list(Config) ->
     { ok, Ip } = inet_parse:address(erlagi_options:get_option(ip, Config)),
@@ -62,15 +61,14 @@ open_socket(Config) when is_list(Config) ->
         { backlog, Backlog }
     ],
     {ok, Socket} = gen_tcp:listen(Port, Options),
-    Socket
-.
+    Socket.
 
-run(CallHandler, Config) when is_list(Config) ->
+start_link(CallHandler, Config) when is_list(Config) ->
     Socket = open_socket(Config),
     Spawn = erlagi_options:get_option(spawn_server, Config),
     Log = erlagi_log:get_logger(erlagi_options:get_option(logfile, Config)),
     case Spawn of
-        true -> 
+        true ->
             Pid = spawn(fun() ->
                 receive
                     go ->
@@ -84,10 +82,8 @@ run(CallHandler, Config) when is_list(Config) ->
             Pid ! go,
             Pid;
         false -> accept_loop(Socket, Log, CallHandler)
-    end
-.
+    end.
 
-run(CallHandler) ->
-    run(CallHandler, erlagi_defaults:get_default_options())
-.
+start_link(CallHandler) ->
+    start_link(CallHandler, erlagi_defaults:get_default_options()).
 

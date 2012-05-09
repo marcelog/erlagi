@@ -14,7 +14,6 @@ get_default_options() ->
         { backlog, 10 },
         { logfile, "/tmp/erlagi.log" },
         { spawn_server, true }
-    ]
-.
+    ].
 
 

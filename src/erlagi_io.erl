@@ -16,22 +16,18 @@
 
 close(#agicall{} = Call) ->
     F = Call#agicall.close,
-    F()
-.
+    F().
 
 send(#agicall{} = Call, Text) ->
     F = Call#agicall.send,
-    F(Text)
-.
+    F(Text).
 
 recv(#agicall{} = Call) ->
     F = Call#agicall.read,
-    F()
-.
+    F().
 
 quote_word(Text) ->
-    erlagi_misc:concat([[34], Text, [34]])
-.
+    erlagi_misc:concat([[34], Text, [34]]).
 
 escape_quotes(Text) ->
     lists:map(
@@ -42,34 +38,27 @@ escape_quotes(Text) ->
             end
         end,
         Text
-    )
-.
+    ).
 
 quote_arguments(Arguments) when is_list(Arguments) ->
-    lists:map(fun(Text) -> quote_word(escape_quotes(Text)) end, Arguments)
-.
+    lists:map(fun(Text) -> quote_word(escape_quotes(Text)) end, Arguments).
 
 form_arguments(Arguments) when is_list(Arguments) ->
-    string:join(quote_arguments(Arguments), [32])
-.
+    string:join(quote_arguments(Arguments), [32]).
 
 form_agi_cmd(Command, Arguments) when is_list(Arguments) ->
-    erlagi_misc:concat([ Command, [32], form_arguments(Arguments) ])
-.
+    erlagi_misc:concat([ Command, [32], form_arguments(Arguments) ]).
 
 remove_eol(Text) ->
-    Text -- [10] % \n
-.
+    Text -- [10]. % \n
 
 agi_rw(Call, Command, Arguments) when is_list(Arguments), is_record(Call, agicall) ->
     Cmd = form_agi_cmd(Command, Arguments),
     send(Call, erlagi_misc:concat([Cmd, [10]])),
     Result = erlagi_result:parse_result(Cmd, remove_eol(recv(Call))),
-    Result
-.
+    Result.
 
 agi_rw(Call, Command) when is_record(Call, agicall) ->
-    agi_rw(Call, Command, [])
-.
+    agi_rw(Call, Command, []).
 
 
