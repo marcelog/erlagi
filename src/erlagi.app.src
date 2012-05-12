@@ -1,8 +1,8 @@
 {application, erlagi, [
     {description, "Asterisk Gateway Interface (AGI) client for erlang/otp"},
-    {vsn, tag},
+    {vsn, git},
     {registered, []},
     {applications, [kernel, stdlib, sasl]},
     {mod, { erlagi_app, []}},
     {env, []}
-]}.
+ ]}.

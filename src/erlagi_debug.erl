@@ -7,11 +7,6 @@
 
 -include("erlagi_types.hrl").
 
--import(io).
--import(lists).
--import(erlagi_log).
--import(erlagi_result).
-
 -export( [ print_result/2, print_agicall/1 ] ).
 
 print_result(Log, #agiresult{} = Result) ->

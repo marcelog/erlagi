@@ -22,8 +22,6 @@
 
 -include("erlagi_types.hrl").
 
--import(string).
-
 -export( [
     parse_result/2, parse_ascii_digit_result/1, parse_digit_result/1,
     get_digits/1, has_input/1, is_timeout/1, has_data/1, get_data/1,

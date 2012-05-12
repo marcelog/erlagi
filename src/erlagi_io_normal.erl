@@ -4,8 +4,6 @@
 -homepage("http://marcelog.github.com/").
 -license("Apache License 2.0").
 
--import(io).
-
 -export([get_close_fun/0, get_send_fun/0, get_recv_fun/0]).
 
 get_close_fun() ->

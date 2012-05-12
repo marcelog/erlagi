@@ -20,8 +20,6 @@
 -homepage("http://marcelog.github.com/").
 -license("Apache License 2.0").
 
--import(erlagi_defaults).
-
 -export([get_option/2]).
 
 get_option(Key, Options) ->

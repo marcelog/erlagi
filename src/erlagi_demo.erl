@@ -6,11 +6,6 @@
 -license("Apache License 2.0").
 
 -include("erlagi_types.hrl").
--import(io).
--import(erlang).
--import(erlagi).
--import(erlagi_log).
--import(erlagi_debug).
 
 -export( [ run/1 ]).
 

@@ -1,89 +1,96 @@
+%%% A FastAGI server.
+%%%
+%%% Copyright 2012 Marcelo Gornstein <marcelog@gmail.com>
+%%%
+%%% Licensed under the Apache License, Version 2.0 (the "License");
+%%% you may not use this file except in compliance with the License.
+%%% You may obtain a copy of the License at
+%%%
+%%%     http://www.apache.org/licenses/LICENSE-2.0
+%%%
+%%% Unless required by applicable law or agreed to in writing, software
+%%% distributed under the License is distributed on an "AS IS" BASIS,
+%%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%%% See the License for the specific language governing permissions and
+%%% limitations under the License.
 -module(erlagi_fastagi).
-
 -author("Marcelo Gornstein <marcelog@gmail.com>").
 -github("https://github.com/marcelog").
 -homepage("http://marcelog.github.com/").
 -license("Apache License 2.0").
 
--import(erlagi).
--import(erlagi_log).
--import(erlagi_io_tcp).
--import(erlagi_options).
--import(erlagi_defaults).
--import(inet_parse).
--import(gen_tcp).
+-behaviour(supervisor).
 
--export([run/2, run/1]).
+-include_lib("kernel/include/inet.hrl").
 
-accept_loop(Socket, Log, CallHandler) ->
-    AcceptResult = gen_tcp:accept(Socket, 10),
-    case AcceptResult of
-        {ok, ClientSocket} ->
-            Call = erlagi:new_call(
-                Log,
-                erlagi_io_tcp:get_recv_fun(ClientSocket),
-                erlagi_io_tcp:get_send_fun(ClientSocket),
-                erlagi_io_tcp:get_close_fun(ClientSocket)
-            ),
-            Handler = spawn(
-                fun() ->
-                    receive
-                        go ->
-                            CallHandler(Call),
-                            erlang:exit(call_done)
-                    after 5000 ->
-                        erlang:error(never_got_go)
-                    end
-                end
-            ),
-            gen_tcp:controlling_process(ClientSocket, Handler),
-            Handler ! go;
-        {error, timeout} -> true
-    end,
-    receive
-        close ->
-            erlagi_log:log(Log, "Terminated by user~n"),
-            gen_tcp:close(Socket),
-            exit(terminated_by_user)
-    after 10 ->
-        true
-    end,
-    accept_loop(Socket, Log, CallHandler).
+%% API
+-export([start_link/2]).
 
-open_socket(Config) when is_list(Config) ->
-    { ok, Ip } = inet_parse:address(erlagi_options:get_option(ip, Config)),
-    Port = erlagi_options:get_option(port, Config),
-    Backlog = erlagi_options:get_option(backlog, Config),
+%% Supervisor callbacks
+-export([init/1]).
+
+%% Helper macro for declaring children of supervisor
+-define(
+    CHILD(Name, Args),
+    {Name,
+        {erlagi_fastagi_worker, start_link, Args},
+        permanent, 5000, worker, [?MODULE]
+    }
+).
+
+%% ===================================================================
+%% API functions
+%% ===================================================================
+start_link(Name, ServerInfo) ->
+    supervisor:start_link({local, Name}, ?MODULE, ServerInfo).
+
+%% ===================================================================
+%% Supervisor callbacks
+%% ===================================================================
+init(ServerInfo) ->
+    {host, Host} = lists:keyfind(host, 1, ServerInfo),
+    {port, Port} = lists:keyfind(port, 1, ServerInfo),
+    {backlog, Backlog} = lists:keyfind(backlog, 1, ServerInfo),
+    {callback, Callback} = lists:keyfind(callback, 1, ServerInfo),
+    {logfile, Logfile} = lists:keyfind(logfile, 1, ServerInfo),
+    {ok, #hostent{h_addr_list=Addresses}} = resolve_host(Host),
+    Log = erlagi_log:get_logger(Logfile),
+    [Address|_] = Addresses,
     Options = [
-        { ip, Ip},
-        { active, false },
-        { reuseaddr, true },
-        { backlog, Backlog }
+        {ip, Address},
+        {active, false},
+        {reuseaddr, true},
+        {backlog, Backlog}
     ],
     {ok, Socket} = gen_tcp:listen(Port, Options),
-    Socket.
+    Children = for_loop(1, Backlog, fun(IterNumber) ->
+        WorkerName = list_to_atom(string:join([
+            "fastagi",
+            Host,
+            integer_to_list(Port),
+            integer_to_list(IterNumber)
+            ], "-"
+        )),
+        ?CHILD(WorkerName, [Socket, Log, Callback])
+    end),
+    {ok, { {one_for_one, 5, 10}, Children} }.
 
-start_link(CallHandler, Config) when is_list(Config) ->
-    Socket = open_socket(Config),
-    Spawn = erlagi_options:get_option(spawn_server, Config),
-    Log = erlagi_log:get_logger(erlagi_options:get_option(logfile, Config)),
-    case Spawn of
-        true ->
-            Pid = spawn(fun() ->
-                receive
-                    go ->
-                        erlagi_log:log(Log, "Spawned FastAGI server~n"),
-                        accept_loop(Socket, Log, CallHandler)
-                after 5000 ->
-                    erlang:error(never_got_go)
-                end
-            end),
-            gen_tcp:controlling_process(Socket, Pid),
-            Pid ! go,
-            Pid;
-        false -> accept_loop(Socket, Log, CallHandler)
+%% @doc Resolves a hostname or ip address into a hostent().
+-spec resolve_host(Host::string()) -> {ok, inet:hostent()} | cantresolve.
+resolve_host(Host) ->
+    case inet:gethostbyaddr(Host) of
+        {ok, Result} -> {ok, Result};
+        _ -> inet:gethostbyname(Host)
     end.
 
-start_link(CallHandler) ->
-    start_link(CallHandler, erlagi_defaults:get_default_options()).
+for_loop(Start, Total, What) ->
+    for_loop(Start, Total, What, []).
+
+for_loop(Start, Total, What, Acc) ->
+    Top = Total + 1,
+    case Start of
+        Top -> Acc;
+        X ->
+            for_loop(Start + 1, Total, What, [What(X)|Acc])
+    end.
 

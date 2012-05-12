@@ -29,7 +29,8 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    erlagi_sup:start_link().
+    {ok, ServerAddresses} = application:get_env(listen),
+    erlagi_sup:start_link(ServerAddresses).
 
 stop(_State) ->
     ok.

@@ -3,7 +3,6 @@
 -include("erlagi_types.hrl").
 -import(io).
 -import(file).
--import(erlagi_misc).
 
 -export([open/1, log/2, log/3, close/1, get_logger/1]).
 

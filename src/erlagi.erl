@@ -28,7 +28,6 @@
 -import(erlagio_io).
 -import(erlagio_log).
 -import(erlagio_io_normal).
--import(erlagi_misc).
 -import(erlagi_result).
 -import(erlagi_read_env).
 
@@ -64,7 +63,7 @@ terminate(#agicall{} = Call) ->
     erlagi_io:close(Call).
 
 set_callerid(#agicall{} = Call, Name, Number) ->
-    Clid = erlagi_misc:concat([ [ 34 ], Name, [ 34, 60 ], Number, [ 62 ] ]),
+    Clid = string:join([[34], Name, [34, 60], Number, [62]], ""),
     erlagi_io:agi_rw(Call, "SET CALLERID", [ Clid ]).
 
 enable_music(#agicall{} = Call) ->
@@ -92,7 +91,7 @@ record(#agicall{} = Call, Filename, Format, EscapeDigits, MaxMilliseconds, MaxSi
     ->
     record(Call, [
         Filename, Format, EscapeDigits, MaxMilliseconds,
-        erlagi_misc:concat([ "s=", MaxSilenceSeconds ])
+        string:concat("s=", MaxSilenceSeconds)
     ]).
 
 record(#agicall{} = Call, Filename, Format, EscapeDigits, MaxMilliseconds) ->
@@ -209,7 +208,7 @@ get_variable(#agicall{} = Call, Name) ->
 
 get_full_variable(#agicall{} = Call, Name) ->
     erlagi_result:get_variable(erlagi_io:agi_rw(
-        Call, "GET FULL VARIABLE", [ erlagi_misc:concat([ "${", Name, "}" ]) ]
+        Call, "GET FULL VARIABLE", [string:join(["${", Name, "}"], "")]
     )).
 
 set_variable(#agicall{} = Call, Name, Value) ->
@@ -329,7 +328,7 @@ form_exec_arguments(Arguments) when is_list(Arguments), length(Arguments) > 0 ->
 
 exec(#agicall{} = Call, Application, Arguments) when is_list(Arguments) ->
     ExecArguments = form_exec_arguments(Arguments),
-    ExecCmd = erlagi_misc:concat([ "EXEC ", [34], Application, [34]]),
+    ExecCmd = string:join(["EXEC ", [34], Application, [34]], ""),
     erlagi_io:agi_rw(Call, ExecCmd, [ ExecArguments ]).
 
 exec(#agicall{} = Call, Application) ->

@@ -21,10 +21,7 @@
 -homepage("http://marcelog.github.com/").
 -license("Apache License 2.0").
 
--import(erlagio_io).
--import(erlang_read_env).
-
--export( [ read/1 ] ).
+-export([read/1]).
 
 split_lines(Text) ->
     string:tokens(Text, [10]).

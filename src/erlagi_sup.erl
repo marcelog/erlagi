@@ -22,7 +22,7 @@
 -behaviour(supervisor).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 
 %% Supervisor callbacks
 -export([init/1]).
@@ -32,28 +32,28 @@
     CHILD(Name, Args),
     {Name,
         {erlagi_fastagi, start_link, Args},
-        permanent, 5000, worker, [?MODULE]
+        permanent, infinity, worker, [?MODULE]
     }
 ).
 
 %% ===================================================================
 %% API functions
 %% ===================================================================
-start_link() ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+start_link(ServerAddresses) ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, ServerAddresses).
 
 %% ===================================================================
 %% Supervisor callbacks
 %% ===================================================================
-init([ListenAddresses]) ->
+init(ServerAddresses) ->
     Children = lists:map(
-        fun(ListenAddress) ->
-            {host, Host} = lists:keyfind(host, 1, ListenAddress),
-            {port, Port} = lists:keyfind(port, 1, ListenAddress),
-            WorkerName = erlagi_client:get_worker_name(ServerName),
-            ?CHILD(ServerName, [ServerName, WorkerName, ServerInfo])
+        fun({ServerName, ServerInfo}) ->
+            WorkerName = list_to_atom(string:concat(
+                "fastagi-sup-", atom_to_list(ServerName)
+            )),
+            ?CHILD(WorkerName, [WorkerName, ServerInfo])
         end,
-        AsteriskServers
+        ServerAddresses
     ),
     {ok, { {one_for_one, 5, 10}, Children} }.
 
