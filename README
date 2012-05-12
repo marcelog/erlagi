@@ -25,7 +25,8 @@ See the example files:
 to handle 1 call (See extension 1, below).
 
  * bin/run_fastagi.sh: Starts the FastAGI server and accepts
-multiple calls (See extension 2, below).
+multiple calls (See extension 2, below). Will spawn as many workers as specified
+in the backlog option to accept incoming connections.
 
 OTP
 ---
@@ -84,11 +85,9 @@ Start the FastAGI server with erlagi_fastagi:run/1, like:
 4>
 
 So that's how you start and stop the fastagi server (using the
-example shipped "application"). If you don't issue the #4
-command (leaving the server running and accepting connections),
-a process will be spawn()ed for every call. Reload your asterisk
+example shipped "application"). Reload your asterisk
 and make a couple of calls to the extension. You should see some
-output in the shell.
+output in the shell and the log file.
 
 Running the FastAGI server from OS command line
 -----------------------------------------------
@@ -115,9 +114,9 @@ be really appreciated :)
 Main modules
 ------------
  * erlagi: The AGI library.
- * erlagi_fastagi: A FastAGI server that will create and listen in a socket,
- spawning and supervising N workers to accept a connection call the callback,
- passing in an #agicall record.
+ * erlagi_fastagi: A FastAGI server (and supervisor) that will create and
+ listen in a socket, spawning and supervising N workers to accept a connection
+ call the callback, passing in an #agicall record.
  * erlagi_debug: Some useful functions to debug your
 application.
  * erlagi_demo: An example ivr "application".
