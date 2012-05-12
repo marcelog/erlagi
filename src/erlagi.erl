@@ -22,15 +22,6 @@
 
 -include("erlagi_types.hrl").
 
--import(io).
--import(lists).
--import(string).
--import(erlagio_io).
--import(erlagio_log).
--import(erlagio_io_normal).
--import(erlagi_result).
--import(erlagi_read_env).
-
 -export( [
     new_call/4, new_call/1, terminate/1,
     answer/1, hangup/1, stream_file/3, stream_file/2, exec/2, exec/3, log/3, verbose/2,
