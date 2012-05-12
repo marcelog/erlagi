@@ -7,7 +7,7 @@
 
 -include("erlagi_types.hrl").
 
--export( [ run/1 ]).
+-export( [ new_call/1 ]).
 
 run_command(Module, Function, Arguments) ->
     [Call | _] = Arguments,
@@ -18,7 +18,7 @@ run_command(Module, Function, Arguments) ->
         false -> erlagi_log:log(Log, "~s~n", [Result])
     end.
 
-run(Call) when is_record(Call, agicall) ->
+new_call(Call) when is_record(Call, agicall) ->
     run_command(erlagi_debug,print_agicall, [Call]),
     run_command(erlagi, answer, [Call]),
     run_command(erlagi, enable_music, [Call]),

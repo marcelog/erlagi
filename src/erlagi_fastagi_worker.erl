@@ -39,7 +39,7 @@ loop(Socket, Log, Callback) ->
                 fun() ->
                     receive
                         go ->
-                            Callback(Call),
+                            apply(Callback, new_call, [Call]),
                             erlang:exit(call_done)
                     after 5000 ->
                         erlang:error(never_got_go)
