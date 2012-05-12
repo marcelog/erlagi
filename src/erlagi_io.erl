@@ -48,7 +48,7 @@ remove_eol(Text) ->
 
 agi_rw(Call, Command, Arguments) when is_list(Arguments), is_record(Call, agicall) ->
     Cmd = form_agi_cmd(Command, Arguments),
-    send(Call, string:join(Cmd, [10])),
+    send(Call, string:concat(Cmd, [10])),
     Result = erlagi_result:parse_result(Cmd, remove_eol(recv(Call))),
     Result.
 
