@@ -1,11 +1,11 @@
 erlagi (ERLang AGI implementation)
 ----------------------------------
 
-This is a library intended to be used for developing 
-telephony applications for Asterisk using Erlang. 
+This is a library and an OTP application, intended to be used for developing
+and serving telephony applications for Asterisk using Erlang.
 
 It can be used with and without FastAGI. A FastAGI server
-implementation is included, suitable to run many calls 
+implementation is included, suitable to run many calls
 concurrently, on 1 or more erlang nodes.
 
 I used my own box to test it, with R13B04. Please
@@ -27,10 +27,28 @@ to handle 1 call (See extension 1, below).
  * bin/run_fastagi.sh: Starts the FastAGI server and accepts
 multiple calls (See extension 2, below).
 
+OTP
+---
+erlagi is also the name of the included OTP application. Just start is as
+any other application, like:
+
+1> application:start(erlagi).
+
+The application will start a supervisor, that has 1 supervisor per configured
+listening address, which in turn, contain as many workers as the configured
+backlog.
+
+So let's say you configure 2 listening address, with a backlog of 5 each. This
+will result in having:
+ * 1 main supervisor, that supervises...
+ * 2 Listeners (1 per address), which in turn supervises..
+ * 10 workers which accept the client connections (5 per listening address).
+
 Compiling
 ---------
 Just type make in the top level directory. The .beam files will
-be generated in the ebin/ directory.
+be generated in the ebin/ directory. The Makefile contains the correct
+rebar commands to run.
 
 Running it
 ----------
@@ -54,13 +72,16 @@ Start the FastAGI server with erlagi_fastagi:run/1, like:
 {ok,erlagi_fastagi}
 2> c(erlagi_demo).
 {ok,erlagi_demo}
-3> Pid = erlagi_fastagi:run(fun erlagi_demo:run/1).
-Spawned FastAGI server
-<0.46.0>
-4> Pid ! close.
-Terminated by user
-close
-5>
+3> Pid = erlagi_fastagi:start_link(
+    demo_app, [
+        {host, "127.0.0.1"},
+        {port, 20000},
+        {backlog, 5},
+        {callback, erlagi_demo}, % A module that implements new_call/1
+        {logfile, "/tmp/erlagi.log"}
+    ]).
+{ok,<0.33.0>}
+4>
 
 So that's how you start and stop the fastagi server (using the
 example shipped "application"). If you don't issue the #4
@@ -75,22 +96,15 @@ See the example in bin/run_fastagi.sh
 
 Configuring
 -----------
-You can see the default FastAGI server values in erlagi_defaults.erl:
+You can see how to configure the erlagi application (and how to run a fastagi
+server) in rel/files/sys.config:
 [
-    { ip, "127.0.0.1" },
-    { port, 4573 },
-    { backlog, 10 },
-    { logfile, "/tmp/erlagi.log" },
+    {host, "127.0.0.1"},
+    {port, 20000},
+    {backlog, 5},
+    {callback, erlagi_demo},
+    {logfile, "/tmp/erlagi-addressName1.log"}
 ]
-
-To use your own custom options, run the server by calling
-erlagi_fastagi:run/2:
-
-3> Options = [ { ip, "192.168.0.1" }, { port, 5555 }, { backlog, 20 } ].
-[{ip,"192.168.0.1"},{port,5555},{backlog,20}]
-4> erlagi_fastagi:run(fun erlagi_demo:run/1, Options).
-
-It's not necessary to use all the options or to respect any particular order.
 
 Note
 ----
@@ -101,8 +115,9 @@ be really appreciated :)
 Main modules
 ------------
  * erlagi: The AGI library.
- * erlagi_fastagi: A FastAGI server that will accept a
-fun and call it passing in an #agicall record.
+ * erlagi_fastagi: A FastAGI server that will create and listen in a socket,
+ spawning and supervising N workers to accept a connection call the callback,
+ passing in an #agicall record.
  * erlagi_debug: Some useful functions to debug your
 application.
  * erlagi_demo: An example ivr "application".

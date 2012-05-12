@@ -1,25 +1,19 @@
-#!/usr/bin/escript
-
--import(filename).
--import(escript).
--import(code).
--import(io).
--import(erlagi_demo).
--import(erlagi).
+#!/usr/bin/env escript
 
 main(_) ->
     Path = escript:script_name(),
     Dir = filename:dirname(Path),
     true = code:add_patha(Dir ++ "/../ebin"),
-    erlagi_fastagi:run(
-        fun erlagi_demo:run/1,
-        [
-            { ip, "127.0.0.1" },
-            { port, 4573 },
-            { backlog, 10 },
-            { spawn_server, false },
-            { logfile, "/tmp/erlagi.log" }
+    erlagi_fastagi:start_link(
+        demo_app, [
+            {host, "127.0.0.1"},
+            {port, 20000},
+            {backlog, 5},
+            {callback, erlagi_demo},
+            {logfile, "/tmp/erlagi.log"}
         ]
-    )
-.
+    ),
+    receive
+        _ -> ok
+    end.
 
