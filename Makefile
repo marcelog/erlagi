@@ -1,7 +1,6 @@
 NAME=erlagi
 
 all: compile release
-	./rebar compile
 
 compile:
 	./rebar compile
