@@ -1,2 +1,9 @@
-ebin/*
-
+.eunit
+deps
+ebin
+rel/erlagi
+rel/erl_crash.dump
+doc/*.html
+doc/*.png
+doc/*.css
+doc/edoc-info

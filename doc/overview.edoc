@@ -1,0 +1,4 @@
+@author Marcelo Gornstein <marcelog@gmail.com>
+@copyright Marcelo Gornstein
+@title erlagi Application
+@doc An AGI (asterisk gateway interface) client implementation for erlang

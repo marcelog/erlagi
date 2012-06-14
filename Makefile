@@ -1,12 +1,20 @@
-NAME=erlagi
+CWD=$(shell pwd)
+NAME=$(shell basename ${CWD})
 
-all: compile release
+all: clean compile edoc release
+	./rebar compile
+
+edoc:
+	./rebar doc
 
 compile:
 	./rebar compile
 
-release:
-	cd rel && ../rebar generate && cd -
+test: compile
+	./rebar eunit skip_deps=true
+
+release: test
+	(cd rel && ../rebar generate && cd -)
 
 node:
 	(cd rel && ../rebar create-node nodeid=${NAME} && cd -)
