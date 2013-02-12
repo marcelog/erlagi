@@ -29,8 +29,8 @@ split_lines(Text) ->
 %% Returns a tuple, { Key, Value }
 parse_variable(Text) ->
     Index = string:str(Text, ":"),
-    Key = string:left(Text, Index),
-    Value = string:right(Text, string:len(Text) - Index),
+    Key = string:substr(Text, 1, Index-1),
+    Value = string:substr(Text, Index + 2),
     { Key, Value }.
 
 parse_variables(Text) ->
