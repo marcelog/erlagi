@@ -55,7 +55,7 @@ split_result_line(Text) ->
 
 check_result(ResultExploded) when is_list(ResultExploded) ->
     case ResultExploded of
-        [ "HANGUP" | _ ] -> erlang:error(call_terminated);
+        [ "HANGUP" | _ ] -> ResultExploded;
         [ "200" | _ ] -> ResultExploded;
         _ -> erlang:error( { invalid_result, string:join(ResultExploded, " ") })
     end.
