@@ -64,8 +64,11 @@ remove_eol(Text) ->
 agi_rw(Call, Command, Arguments) when is_list(Arguments), is_record(Call, agicall) ->
     Cmd = form_agi_cmd(Command, Arguments),
     send(Call, string:concat(Cmd, [10])),
-    Result = erlagi_result:parse_result(Cmd, remove_eol(recv(Call))),
-    Result.
+    Result = case remove_eol(recv(Call)) of
+        "HANGUP" -> remove_eol(recv(Call));
+        RawResult -> RawResult
+    end,
+    erlagi_result:parse_result(Cmd, Result).
 
 agi_rw(Call, Command) when is_record(Call, agicall) ->
     agi_rw(Call, Command, []).
