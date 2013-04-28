@@ -78,8 +78,7 @@ Start the FastAGI server with erlagi_fastagi:run/1, like:
         {host, "127.0.0.1"},
         {port, 20000},
         {backlog, 5},
-        {callback, erlagi_demo}, % A module that implements new_call/1
-        {logfile, "/tmp/erlagi.log"}
+        {callback, erlagi_demo} % A module that implements new_call/1
     ]).
 {ok,<0.33.0>}
 4>
@@ -101,8 +100,7 @@ server) in rel/files/sys.config:
     {host, "127.0.0.1"},
     {port, 20000},
     {backlog, 5},
-    {callback, erlagi_demo},
-    {logfile, "/tmp/erlagi-addressName1.log"}
+    {callback, erlagi_demo}
 ]
 
 Note

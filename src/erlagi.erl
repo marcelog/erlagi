@@ -23,7 +23,7 @@
 -include("erlagi_types.hrl").
 
 -export( [
-    new_call/4, new_call/1, terminate/1,
+    new_call/3, new_call/0, terminate/1,
     answer/1, hangup/1, stream_file/3, stream_file/2, exec/2, exec/3, log/3, verbose/2,
     log_notice/2, log_debug/2, log_warn/2, log_error/2, log_verbose/2, log_dtmf/2,
     stop_play_tones/1, play_custom_tones/2, play_tone/2,
@@ -40,15 +40,15 @@
     enable_music/1, enable_music/2, disable_music/1, disable_music/2, set_callerid/3
 ]).
 
-new_call(Log) ->
+new_call() ->
     ReadFun = erlagi_io_normal:get_recv_fun(),
     SendFun = erlagi_io_normal:get_send_fun(),
     CloseFun = erlagi_io_normal:get_close_fun(),
-    new_call(Log, ReadFun, SendFun, CloseFun).
+    new_call(ReadFun, SendFun, CloseFun).
 
-new_call(Log, ReadFun, SendFun, CloseFun) ->
+new_call(ReadFun, SendFun, CloseFun) ->
     Env = erlagi_read_env:read(ReadFun),
-    #agicall{environment=Env, close=CloseFun, read=ReadFun, send=SendFun, log=Log}.
+    #agicall{environment=Env, close=CloseFun, read=ReadFun, send=SendFun}.
 
 terminate(#agicall{} = Call) ->
     erlagi_io:close(Call).

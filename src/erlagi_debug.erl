@@ -22,25 +22,34 @@
 
 -include("erlagi_types.hrl").
 
--export([print_result/2, print_agicall/1]).
+-export([print_result/1, print_agicall/1]).
 
-print_result(Log, #agiresult{} = Result) ->
-    erlagi_log:log(Log, "----- AgiResult -----~n"),
-    erlagi_log:log(Log, "Command: ~s~n", [ erlagi_result:get_cmd(Result) ]),
-    erlagi_log:log(Log, "Raw: ~s~n", [ erlagi_result:get_raw(Result) ]),
-    erlagi_log:log(Log, "Result: ~s~n", [ erlagi_result:get_result(Result) ]),
-    erlagi_log:log(Log, "Digits: ~s~n", [ erlagi_result:get_digits(Result) ]),
-    erlagi_log:log(Log, "Timeout: ~s~n", [ erlagi_result:is_timeout(Result) ]),
-    erlagi_log:log(Log, "Offset: ~s~n", [ erlagi_result:get_offset(Result) ]),
-    erlagi_log:log(Log, "Data: ~s~n", [ erlagi_result:get_data(Result) ]),
-    erlagi_log:log(Log, "---------------------~n").
+print_result(#agiresult{} = Result) ->
+    lager:debug(
+        "----- AgiResult -----~n"
+        ++ "Command: ~s~n"
+        ++ "Raw: ~s~n"
+        ++ "Result: ~s~n"
+        ++ "Digits: ~s~n"
+        ++ "Timeout: ~s~n"
+        ++ "Offset: ~s~n"
+        ++ "Data: ~s~n"
+        ++ "---------------------~n", [
+        erlagi_result:get_cmd(Result),
+        erlagi_result:get_raw(Result),
+        erlagi_result:get_result(Result),
+        erlagi_result:get_digits(Result),
+        erlagi_result:is_timeout(Result),
+        erlagi_result:get_offset(Result),
+        erlagi_result:get_data(Result)
+    ]).
 
-print_variable(Log, {Key, Value}) ->
-    erlagi_log:log(Log, "Variable [ ~s = ~s ]~n", [ Key, Value ]).
+print_variable({Key, Value}) ->
+    lager:debug("Variable [ ~s = ~s ]~n", [Key, Value]).
 
-print_agicall(#agicall{environment = Env, log = Log}) ->
-    erlagi_log:log(Log, "----- AgiCall -----~n"),
-    [ print_variable(Log, V) || V <- Env],
-    erlagi_log:log(Log, "-------------------~n").
+print_agicall(#agicall{environment = Env}) ->
+    lager:debug("----- AgiCall -----~n"),
+    [ print_variable(V) || V <- Env],
+    lager:debug("-------------------~n").
 
 

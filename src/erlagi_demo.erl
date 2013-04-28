@@ -25,12 +25,10 @@
 -export([new_call/1]).
 
 run_command(Module, Function, Arguments) ->
-    [Call | _] = Arguments,
-    Log = Call#agicall.log,
     Result = erlang:apply(Module, Function, Arguments),
     case is_record(Result, agiresult) of
-        true -> erlagi_debug:print_result(Log, erlang:apply(Module, Function, Arguments));
-        false -> erlagi_log:log(Log, "~s~n", [Result])
+        true -> erlagi_debug:print_result(erlang:apply(Module, Function, Arguments));
+        false -> lager:debug("~s~n", [Result])
     end.
 
 new_call(Call) when is_record(Call, agicall) ->

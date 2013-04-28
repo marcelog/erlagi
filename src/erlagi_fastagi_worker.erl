@@ -20,17 +20,16 @@
 -homepage("http://marcelog.github.com/").
 -license("Apache License 2.0").
 
--export([start_link/3, loop/3]).
+-export([start_link/2, loop/2]).
 
-start_link(Socket, Log, Callback) ->
-    {ok, spawn_link(?MODULE, loop, [Socket, Log, Callback])}.
+start_link(Socket, Callback) ->
+    {ok, spawn_link(?MODULE, loop, [Socket, Callback])}.
 
-loop(Socket, Log, Callback) ->
+loop(Socket, Callback) ->
     AcceptResult = gen_tcp:accept(Socket, 5),
     case AcceptResult of
         {ok, ClientSocket} ->
             Call = erlagi:new_call(
-                Log,
                 erlagi_io_tcp:get_recv_fun(ClientSocket),
                 erlagi_io_tcp:get_send_fun(ClientSocket),
                 erlagi_io_tcp:get_close_fun(ClientSocket)
@@ -52,11 +51,11 @@ loop(Socket, Log, Callback) ->
     end,
     receive
         close ->
-            erlagi_log:log(Log, "Terminated by user~n"),
+            lager:info("Terminated by user"),
             gen_tcp:close(Socket),
             exit(terminated_by_user)
     after 5 ->
         true
     end,
-    loop(Socket, Log, Callback).
+    loop(Socket, Callback).
 

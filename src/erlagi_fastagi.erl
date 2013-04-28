@@ -48,13 +48,12 @@ start_link(Name, ServerInfo) ->
 %% Supervisor callbacks
 %% ===================================================================
 init(ServerInfo) ->
+lager:debug("XXXXX"),
     {host, Host} = lists:keyfind(host, 1, ServerInfo),
     {port, Port} = lists:keyfind(port, 1, ServerInfo),
     {backlog, Backlog} = lists:keyfind(backlog, 1, ServerInfo),
     {callback, Callback} = lists:keyfind(callback, 1, ServerInfo),
-    {logfile, Logfile} = lists:keyfind(logfile, 1, ServerInfo),
     {ok, #hostent{h_addr_list=Addresses}} = resolve_host(Host),
-    Log = erlagi_log:get_logger(Logfile),
     [Address|_] = Addresses,
     Options = [
         {ip, Address},
@@ -71,7 +70,7 @@ init(ServerInfo) ->
             integer_to_list(IterNumber)
             ], "-"
         )),
-        ?CHILD(WorkerName, [Socket, Log, Callback])
+        ?CHILD(WorkerName, [Socket, Callback])
     end),
     {ok, { {one_for_one, 5, 10}, Children} }.
 
