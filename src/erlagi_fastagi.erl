@@ -48,7 +48,6 @@ start_link(Name, ServerInfo) ->
 %% Supervisor callbacks
 %% ===================================================================
 init(ServerInfo) ->
-lager:debug("XXXXX"),
     {host, Host} = lists:keyfind(host, 1, ServerInfo),
     {port, Port} = lists:keyfind(port, 1, ServerInfo),
     {backlog, Backlog} = lists:keyfind(backlog, 1, ServerInfo),
